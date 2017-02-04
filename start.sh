@@ -6,7 +6,6 @@ hour=$(echo $RANDOM % 23 | bc)
 day=$(echo $RANDOM % 27 + 1 | bc)
 
 CRON_REFRESH_FREQUENCY=${CRON_FREQUENCY:-"$minute $hour $day * *"}
-CRON_NEW_CHECK_FREQUENCY=${CRON_FREQUENCY:-"* * * * *"}
 NAMESPACE=${NAMESPACE:-default}
 
 echo "Configuring cron..."
@@ -23,9 +22,6 @@ env_vars="PATH=$PATH KUBERNETES_PORT=$KUBERNETES_PORT KUBERNETES_PORT_443_TCP_PO
 
 refresh_cron="$CRON_REFRESH_FREQUENCY $env_vars SECRET_NAME=$SECRET_NAME NAMESPACE=$NAMESPACE DEPLOYMENTS='$DEPLOYMENTS' DOMAINS='$DOMAINS' EMAIL=$EMAIL /bin/bash /letsencrypt/refresh_certs.sh >> /var/log/cron-encrypt.log 2>&1"
 (crontab -u root -l; echo "$refresh_cron" ) | crontab -u root -
-
-new_cert_cron="$CRON_NEW_CHECK_FREQUENCY $env_vars SECRET_NAME=$SECRET_NAME NAMESPACE=$NAMESPACE DEPLOYMENTS='$DEPLOYMENTS' DOMAINS='$DOMAINS' EMAIL=$EMAIL /bin/bash /letsencrypt/check_new_certs.sh >> /var/log/cron-encrypt.log 2>&1"
-(crontab -u root -l; echo "$new_cert_cron" ) | crontab -u root -
 
 if [ -n "${LETSENCRYPT_ENDPOINT+1}" ]; then
     echo "server = $LETSENCRYPT_ENDPOINT" >> /etc/letsencrypt/cli.ini
