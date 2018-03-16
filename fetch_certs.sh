@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EMAIL=${EMAIL}
+EMAIL="${EMAIL}"
 DOMAINS=(${DOMAINS})
 
 if [ -z "$DOMAINS" ]; then
@@ -17,11 +17,10 @@ domain_args=""
 for i in "${DOMAINS[@]}"
 do
    domain_args="$domain_args -d $i"
-   # do whatever on $i
 done
 
-/usr/local/bin/letsencrypt certonly \
+/usr/bin/certbot certonly \
     --webroot -w /letsencrypt/challenges/ \
     --text --renew-by-default --agree-tos \
       $domain_args \
-     --email=$EMAIL
+     --email="$EMAIL"
